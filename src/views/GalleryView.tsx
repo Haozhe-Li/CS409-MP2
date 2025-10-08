@@ -1,23 +1,18 @@
-// src/views/GalleryView.tsx
-import React, { useState, useEffect, useMemo, ChangeEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { searchMovies, getMovieGenres } from '../api/tmdbApi'; // Ensure correct path to api file
+import { discoverMovies, getMovieGenres } from '../api/tmdbApi';
 import { Movie, Genre } from '../types';
 import MovieCard from '../components/MovieCard';
-import { debounce } from 'lodash';
-import './GalleryView.css'; // Import the new CSS
+import './GalleryView.css';
 
 const GalleryView: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
     const [genres, setGenres] = useState<Genre[]>([]);
     const [selectedGenreIds, setSelectedGenreIds] = useState<number[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
-    const [query, setQuery] = useState<string>('');
-    const [initialLoad, setInitialLoad] = useState<boolean>(true); // To fetch popular movies initially
 
-    // Fetch genres on component mount
     useEffect(() => {
         const fetchGenres = async () => {
             try {
@@ -30,44 +25,22 @@ const GalleryView: React.FC = () => {
         fetchGenres();
     }, []);
 
-    // Debounced movie fetching function
-    // src/views/GalleryView.tsx (Corrected Part)
-
-    // Debounced movie fetching function
-    const fetchMovies = useMemo(
-        () =>
-            debounce(async (searchQuery: string, page: number) => {
-                setLoading(true);
-                try {
-                    const data = await searchMovies(searchQuery, page);
-                    setMovies(data.results);
-                    setTotalPages(data.total_pages);
-                } catch (error) {
-                    console.error('Error fetching movies:', error);
-                } finally {
-                    setLoading(false);
-                }
-            }, 500),
-        [] // useMemo's dependency array. It's empty because the function we are creating doesn't change.
-    );
-
-    // Effect for fetching movies based on query and page
     useEffect(() => {
-        // This effect hook remains largely the same, but now `fetchMovies` is a stable
-        // function reference from useMemo.
-        const currentQuery = query.trim() === '' && initialLoad ? 'popular' : query;
-        fetchMovies(currentQuery, currentPage);
-
-        if (initialLoad) {
-            setInitialLoad(false);
-        }
-
-        // Cleanup function to cancel the debounce timer if the component unmounts
-        // or dependencies change before the timer fires.
-        return () => {
-            fetchMovies.cancel();
+        const fetchMovies = async () => {
+            setLoading(true);
+            try {
+                const data = await discoverMovies(currentPage, selectedGenreIds);
+                setMovies(data.results);
+                setTotalPages(data.total_pages > 500 ? 500 : data.total_pages); // TMDB API caps results at page 500 for discover
+            } catch (error) {
+                console.error('Error fetching movies:', error);
+            } finally {
+                setLoading(false);
+            }
         };
-    }, [query, currentPage, fetchMovies, initialLoad]); // `fetchMovies` is now stable.
+
+        fetchMovies();
+    }, [currentPage, selectedGenreIds]); // Re-fetch when page or genres change
 
     const handleGenreChange = (event: ChangeEvent<HTMLInputElement>) => {
         const genreId = Number(event.target.value);
@@ -77,11 +50,6 @@ const GalleryView: React.FC = () => {
         setCurrentPage(1); // Reset to first page when genre filters change
     };
 
-    const handleQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setQuery(event.target.value);
-        setCurrentPage(1); // Reset page on new query
-    };
-
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setCurrentPage(newPage);
@@ -89,28 +57,14 @@ const GalleryView: React.FC = () => {
         }
     };
 
-    const filteredMovies = useMemo(() => {
-        if (selectedGenreIds.length === 0) {
-            return movies;
-        }
-        return movies.filter((movie) =>
-            selectedGenreIds.some((genreId) => movie.genre_ids.includes(genreId))
-        );
-    }, [movies, selectedGenreIds]);
-    const allMovieIds = filteredMovies.map(movie => movie.id);
+    // Get all movie IDs for the current page to pass to the detail view
+    const allMovieIds = movies.map(movie => movie.id);
 
     return (
         <div className="view-container gallery-view">
             <h2>Movie Gallery</h2>
             <div className="controls-container">
-                <input
-                    type="text"
-                    placeholder="Search movies..."
-                    value={query}
-                    onChange={handleQueryChange}
-                    className="search-bar"
-                />
-
+                {/* Search bar removed */}
                 <div className="genre-filters">
                     <h4>Filter by Genre:</h4>
                     <div className="genre-pills">
@@ -131,18 +85,18 @@ const GalleryView: React.FC = () => {
             </div>
 
             {loading && <p className="loading-text">Loading movies...</p>}
-            {!loading && filteredMovies.length === 0 && (
+            {!loading && movies.length === 0 && (
                 <p className="no-results-text">No movies found matching your criteria.</p>
             )}
 
-            {!loading && filteredMovies.length > 0 && (
+            {!loading && movies.length > 0 && (
                 <>
                     <div className="movie-grid">
-                        {filteredMovies.map((movie) => (
+                        {movies.map((movie) => (
                             <Link
                                 key={movie.id}
                                 to={`/movie/${movie.id}`}
-                                state={{ movieIds: allMovieIds }} // <-- THIS IS THE REQUIRED CHANGE
+                                state={{ movieIds: allMovieIds }}
                             >
                                 <MovieCard movie={movie} />
                             </Link>
