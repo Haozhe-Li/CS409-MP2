@@ -1,6 +1,6 @@
 // src/App.tsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
 import ListView from './views/ListView';
 import GalleryView from './views/GalleryView';
 import MovieDetailView from './views/MovieDetailView';

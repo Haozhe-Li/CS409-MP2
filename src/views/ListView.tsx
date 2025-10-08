@@ -1,7 +1,7 @@
 // src/views/ListView.tsx
 import React, { useState, useEffect, useMemo, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { searchMovies, getImageUrl } from '../api/tmdbApi';
+import { searchMovies } from '../api/tmdbApi';
 import { Movie } from '../types';
 import MovieCard from '../components/MovieCard'; // Reusable component
 import { debounce } from 'lodash';

@@ -1,5 +1,5 @@
 // src/views/GalleryView.tsx
-import React, { useState, useEffect, useMemo, ChangeEvent, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { searchMovies, getMovieGenres } from '../api/tmdbApi'; // Ensure correct path to api file
 import { Movie, Genre } from '../types';
@@ -31,38 +31,43 @@ const GalleryView: React.FC = () => {
     }, []);
 
     // Debounced movie fetching function
-    const fetchMovies = useCallback(
-        debounce(async (searchQuery: string, page: number) => {
-            setLoading(true);
-            try {
-                const data = await searchMovies(searchQuery, page);
-                setMovies(data.results);
-                setTotalPages(data.total_pages);
-            } catch (error) {
-                console.error('Error fetching movies:', error);
-            } finally {
-                setLoading(false);
-            }
-        }, 500),
-        []
+    // src/views/GalleryView.tsx (Corrected Part)
+
+    // Debounced movie fetching function
+    const fetchMovies = useMemo(
+        () =>
+            debounce(async (searchQuery: string, page: number) => {
+                setLoading(true);
+                try {
+                    const data = await searchMovies(searchQuery, page);
+                    setMovies(data.results);
+                    setTotalPages(data.total_pages);
+                } catch (error) {
+                    console.error('Error fetching movies:', error);
+                } finally {
+                    setLoading(false);
+                }
+            }, 500),
+        [] // useMemo's dependency array. It's empty because the function we are creating doesn't change.
     );
 
     // Effect for fetching movies based on query and page
     useEffect(() => {
-        // If no query and it's an initial load, fetch popular movies without query
-        // Otherwise, use the query for search
+        // This effect hook remains largely the same, but now `fetchMovies` is a stable
+        // function reference from useMemo.
         const currentQuery = query.trim() === '' && initialLoad ? 'popular' : query;
         fetchMovies(currentQuery, currentPage);
 
-        // Set initialLoad to false after the first fetch
         if (initialLoad) {
             setInitialLoad(false);
         }
 
+        // Cleanup function to cancel the debounce timer if the component unmounts
+        // or dependencies change before the timer fires.
         return () => {
-            fetchMovies.cancel(); // Clean up debounce on unmount or re-render
+            fetchMovies.cancel();
         };
-    }, [query, currentPage, fetchMovies, initialLoad]);
+    }, [query, currentPage, fetchMovies, initialLoad]); // `fetchMovies` is now stable.
 
     const handleGenreChange = (event: ChangeEvent<HTMLInputElement>) => {
         const genreId = Number(event.target.value);
