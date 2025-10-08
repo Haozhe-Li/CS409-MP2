@@ -1,0 +1,145 @@
+/* src/views/MovieDetailView.css */
+
+.movie-detail-container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--color-surface, #1a2238);
+    /* Fallback for dark theme */
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.status-text {
+    text-align: center;
+    font-size: 1.2rem;
+    padding: 4rem 0;
+    color: var(--color-text-secondary);
+}
+
+.error-text {
+    color: #e53e3e;
+    /* Red for errors */
+}
+
+/* --- Detail Navigation --- */
+.detail-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.detail-navigation button {
+    padding: 0.8rem 1.5rem;
+    background-color: var(--color-primary);
+    color: var(--color-text-primary);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.detail-navigation button:hover:not(:disabled) {
+    background-color: var(--color-primary-light);
+    transform: translateY(-2px);
+}
+
+.detail-navigation button:disabled {
+    background-color: #4a5568;
+    color: #a0aec0;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* --- Detail Content Layout --- */
+.detail-content {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2.5rem;
+}
+
+.detail-poster {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.detail-info h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.release-year {
+    font-weight: 400;
+    color: var(--color-text-secondary);
+}
+
+.tagline {
+    font-style: italic;
+    color: var(--color-text-secondary);
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+.detail-info h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.detail-info p {
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 2rem;
+    font-size: 0.95rem;
+}
+
+.info-grid strong {
+    color: var(--color-text-primary);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 800px) {
+    .detail-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .detail-poster-container {
+        max-width: 300px;
+        margin: 0 auto 2rem auto;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        text-align: left;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

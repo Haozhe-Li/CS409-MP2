@@ -1,0 +1,90 @@
+/* src/App.css */
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background-color: var(--color-surface);
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-md);
+}
+
+nav {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+nav a {
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+/* Underline effect on hover/active */
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-primary);
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+nav a:hover,
+nav a.active {
+  /* Add 'active' class support for React Router's NavLink */
+  color: var(--color-text-primary);
+}
+
+nav a:hover::after,
+nav a.active::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+main {
+  flex-grow: 1;
+  padding: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Add to src/App.css */
+.home-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 70vh;
+}
+
+.home-view h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--color-primary-light), var(--color-text-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.home-view p {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+}
