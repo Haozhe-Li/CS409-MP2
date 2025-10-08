@@ -9,7 +9,7 @@ import './App.css'; // For basic styling
 const App: React.FC = () => {
   return (
     // <Router basename="/<your-github-repo-name>">
-    <Router>
+    <Router basename="/CS409-MP2">
       <header>
         <nav>
           <NavLink to="/">Home</NavLink>
